@@ -13,3 +13,25 @@ func main() {
 	app.Listen(":3033")
 
 }
+
+func UnitScan() {
+
+}
+func AcList() {
+
+}
+
+func acCmd(cmd string) {
+	switch cmd {
+	case "power":
+	case "temp":
+	case "speed":
+	case "mode":
+	case "clean":
+	}
+
+}
+func acModel(cmd string) bool {
+
+	return true
+}
