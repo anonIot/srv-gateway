@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -72,17 +73,42 @@ func main() {
 		panic(err)
 	}
 	//covers, err := GetCovers()
-	cover, err := GetCover(1)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	// cover, err := GetCover(1)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
 
-	fmt.Println(cover)
+	// fmt.Println(cover)
 	// for _, cover := range covers {
 
 	// 	fmt.Println(cover)
 	// }
+
+	// Add
+	// cover := Cover{Name: "anon dechpala"}
+	// err = AddCover(cover)
+
+	//update
+	// cover := Cover{Id: 4, Name: "Anan Dechpala"}
+	// err = UpdateCover(cover)
+
+	err = DeleteCover(1)
+	if err != nil {
+		fmt.Println(err)
+		//panic(err)
+		return
+	}
+
+	covers, err := GetCovers()
+	if err != nil {
+		//fmt.Println(err)
+		return
+	}
+	for _, cover := range covers {
+
+		fmt.Println(cover)
+	}
 
 }
 
@@ -108,6 +134,60 @@ func GetCover(id int) (*Cover, error) {
 	return &cover, nil
 
 }
+
+func AddCover(cover Cover) error {
+	query := "insert into customer(name) values (?)"
+	result, err := db.Exec(query, cover.Name)
+
+	if err != nil {
+		return err
+	}
+	affected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if affected <= 0 {
+		return errors.New("can not insert")
+	}
+
+	return nil
+}
+
+func UpdateCover(cover Cover) error {
+	query := "update customer set name=? where id=?"
+	result, err := db.Exec(query, cover.Name, cover.Id)
+
+	if err != nil {
+		return err
+	}
+	affected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if affected <= 0 {
+		return errors.New("can not update")
+	}
+
+	return nil
+}
+func DeleteCover(id int) error {
+	query := "delete from customer where id=?"
+	result, err := db.Exec(query, id)
+
+	if err != nil {
+		return err
+	}
+	affected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if affected <= 0 {
+		return errors.New("can not delete")
+	}
+
+	return nil
+}
+
 func UnitScan() {
 
 }
