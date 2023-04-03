@@ -1,11 +1,11 @@
 package main
 
 import (
-	"database/sql"
 	"errors"
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
 )
 
 type Publisher interface {
@@ -46,7 +46,8 @@ func PublishPost(publish Publisher) error {
 	return publish.Publish()
 }
 
-var db *sql.DB
+// var db *sql.DB
+var db *sqlx.DB
 
 func main() {
 
@@ -68,47 +69,52 @@ func main() {
 	// PublishPost(b)
 
 	var err error
-	db, err = sql.Open("mysql", "root:tiger@/sd_consumer")
+	db, err = sqlx.Open("mysql", "root:tiger@/sd_consumer")
 	if err != nil {
 		panic(err)
 	}
-	//covers, err := GetCovers()
-	// cover, err := GetCover(1)
+
+	// err = DeleteCover(1)
 	// if err != nil {
 	// 	fmt.Println(err)
+	// 	//panic(err)
 	// 	return
 	// }
 
-	// fmt.Println(cover)
+	//covers, err := GetCoversX()
+	covers, err := getCoverX(4)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(covers)
 	// for _, cover := range covers {
 
 	// 	fmt.Println(cover)
 	// }
 
-	// Add
-	// cover := Cover{Name: "anon dechpala"}
-	// err = AddCover(cover)
+}
 
-	//update
-	// cover := Cover{Id: 4, Name: "Anan Dechpala"}
-	// err = UpdateCover(cover)
-
-	err = DeleteCover(1)
+func GetCoversX() ([]Cover, error) {
+	query := "select id,name from customer"
+	covers := []Cover{}
+	err := db.Select(&covers, query)
 	if err != nil {
-		fmt.Println(err)
-		//panic(err)
-		return
+		return nil, err
 	}
 
-	covers, err := GetCovers()
+	return covers, nil
+
+}
+
+func getCoverX(id int) (*Cover, error) {
+	query := "select id,name from customer where id=?"
+	cover := Cover{}
+	err := db.Get(&cover, query, id)
 	if err != nil {
-		//fmt.Println(err)
-		return
+		return nil, err
 	}
-	for _, cover := range covers {
-
-		fmt.Println(cover)
-	}
+	return &cover, nil
 
 }
 
