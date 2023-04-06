@@ -13,7 +13,7 @@ func main() {
 
 	rtuCon := initRtuConfig()
 	client := repository.NewAcRespositoryDB(rtuCon)
-	results, err := client.AcAction(1, 1)
+	results, err := client.AcAction(1, 1, 1000, 0)
 
 	if err != nil {
 		log.Fatalf("Error Read %v", err)

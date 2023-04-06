@@ -9,5 +9,6 @@ type AcPacketRepository struct {
 
 type AcIndoorRepository interface {
 	AcScan() ([]AcPacketRepository, error)
-	AcAction(int, int) (*AcPacketRepository, error)
+	AcAction(int, int, int) (*AcPacketRepository, error)
+	AcRead(int, int) (*AcPacketRepository, error)
 }
