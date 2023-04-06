@@ -1,0 +1,5 @@
+rtu:
+  baudrate: 19200
+  datebits: 8
+  parity: "N"
+  stopbits: 1
