@@ -7,8 +7,13 @@ type AcPacketRepository struct {
 	Timer     string
 }
 
+type AcScanRepository struct {
+	SlaveId   int
+	Value1000 []byte
+}
+
 type AcIndoorRepository interface {
-	AcScan() ([]AcPacketRepository, error)
-	AcAction(int, int, int) (*AcPacketRepository, error)
+	AcScan() ([]AcScanRepository, error)
+	AcAction(int, int, int, int) (*AcPacketRepository, error)
 	AcRead(int, int) (*AcPacketRepository, error)
 }

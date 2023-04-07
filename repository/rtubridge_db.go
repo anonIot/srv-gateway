@@ -12,6 +12,13 @@ type acRepositoryDB struct {
 	Cli *modbus.RTUClientHandler
 }
 
+type acActionCmd struct {
+	SlaveId int
+	BnsId   int
+	Address int
+	Val     int
+}
+
 func NewAcRespositoryDB(Client *modbus.RTUClientHandler) acRepositoryDB {
 
 	return acRepositoryDB{Cli: Client}
@@ -25,13 +32,6 @@ func (r acRepositoryDB) AcAction(slaveID int, bmsId int, addr int, val int) (*Ac
 	handler.SlaveId = byte(sid)
 	acAddress := (addr + (bms * 10)) - 1
 	client := modbus.NewClient(handler)
-
-	// results, err := client.ReadHoldingRegisters(uint16(acAddress), uint16(10))
-
-	// if err != nil {
-	// 	return nil, err
-	// }
-
 	cmd, err := client.WriteSingleRegister(uint16(acAddress), uint16(val))
 
 	if err != nil {
@@ -39,7 +39,6 @@ func (r acRepositoryDB) AcAction(slaveID int, bmsId int, addr int, val int) (*Ac
 		return nil, err
 	}
 	fmt.Println(cmd)
-	//log.Fatalf(string(cmd))
 
 	results, err := client.ReadHoldingRegisters(uint16(acAddress), uint16(10))
 
