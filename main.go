@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/anonIot/srvgw/repository"
+	"github.com/anonIot/srvgw/services"
 	"github.com/goburrow/modbus"
 	"github.com/gorilla/mux"
 )
@@ -27,8 +28,15 @@ func main() {
 
 		//client := repository.NewAcRespositoryDB(rtuCon)
 		client := repository.NewRtuBridgeDevice(rtuCon)
-
-		res, err := client.AcAction(slaveId, bms, 1000, powerVal)
+		rtuSev := services.NewRtuBridgeServiceDevice(client)
+		cmd := services.AcInddorRequest{
+			SlaveId: slaveId,
+			BmsId:   bms,
+			Cmd:     "power",
+			Value:   powerVal,
+		}
+		res, err := rtuSev.GetAcAction(cmd)
+		//res, err := client.AcAction(slaveId, bms, 1000, powerVal)
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)

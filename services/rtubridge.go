@@ -16,5 +16,5 @@ type AcInddorRequest struct {
 
 type RtuBridgeService interface {
 	GetAcValue(int, int) (*AcIndoorInfo, error)
-	GetAcAction(AcInddorRequest) (*AcInddorRequest, error)
+	GetAcAction(AcInddorRequest) (*AcIndoorInfo, error)
 }
