@@ -2,7 +2,6 @@ package services
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/anonIot/srvgw/repository"
 )
@@ -32,31 +31,19 @@ func (s RtuBridgeServiceDevice) GetAcValue(slaveID int, bmsId int) (*AcIndoorInf
 }
 func (s RtuBridgeServiceDevice) GetAcAction(pae AcInddorRequest) (*AcIndoorInfo, error) {
 
-	cmd := strings.ToLower(pae.Cmd)
-
-	switch cmd {
-	case "power":
-		fmt.Println(cmd)
+	result, err := s.RtuDevice.AcAction(pae.SlaveId, pae.BmsId, pae.Addr, pae.Value)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil, nil
+	fmt.Println(result)
+	acInfo := AcIndoorInfo{
+		SlaveId:   result.SlaveId,
+		Bms:       result.Bms,
+		Value1000: result.Value1000,
+		Timer:     result.Timer,
+	}
 
-	/*
-
-		acAddr := int(1000)
-		result, err := s.RtuDevice.AcAction(pae.SlaveId, pae.BmsId, acAddr, pae.Value)
-		if err != nil {
-			return nil, err
-		}
-		acInfo := AcIndoorInfo{
-			SlaveId:   result.SlaveId,
-			Bms:       result.Bms,
-			Value1000: result.Value1000,
-			Timer:     result.Timer,
-		}
-
-		return &acInfo, nil
-
-	*/
+	return &acInfo, nil
 
 }

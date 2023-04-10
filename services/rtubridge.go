@@ -10,7 +10,7 @@ type AcIndoorInfo struct {
 type AcInddorRequest struct {
 	SlaveId int
 	BmsId   int
-	Cmd     string
+	Addr    int
 	Value   int
 }
 

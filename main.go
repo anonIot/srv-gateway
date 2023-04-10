@@ -22,9 +22,13 @@ func main() {
 
 	router := mux.NewRouter()
 
-	router.HandleFunc("/api/v2/indoor/{slaveID:[0-9]+}/{bmsID:[0-9]+}", acHandler.GetAcIndoor).Methods(http.MethodGet)
-	//router.HandleFunc("api/v2/indoor/{slave:[0-9]+}/{bms:[0-9]+}/{cmd:[aA-zZ]}", acHandler.GetAcIndoor).Methods(http.MethodGet)
-
+	//router.HandleFunc("/api/v2/indoor/{slaveID:[0-9]+}/{bmsID:[0-9]+}", acHandler.GetAcIndoor).Methods(http.MethodGet)
+	router.HandleFunc("/api/v2/indoor/cmd/{slaveID:[0-9]+}/{bmsID:[0-9]+}/{cmd:[aA-zZ]+}/{val:[0-9]+}", acHandler.GetAcCmd).Methods(http.MethodGet)
+	router.HandleFunc("/api/v2/indoor/{slaveID:[0-9]+}/{bmsID:[0-9]+}/power/{val:[0-1]+}", acHandler.GetAcPower).Methods(http.MethodGet)
+	router.HandleFunc("/api/v2/indoor/{slaveID:[0-9]+}/{bmsID:[0-9]+}/temp/{val:[0-9]+}", acHandler.GetAcTemp).Methods(http.MethodGet)
+	router.HandleFunc("/api/v2/indoor/{slaveID:[0-9]+}/{bmsID:[0-9]+}/mode/{val:[0-9]+}", acHandler.GetAcMode).Methods(http.MethodGet)
+	//router.HandleFunc("/api/v2/indoor/{slaveID:[0-9]+}/{bmsID:[0-9]+}/fanspeed/{val:[0-9]+}", acHandler.GetAcPower).Methods(http.MethodGet)
+	//router.HandleFunc("/api/v2/indoor/{slaveID:[0-9]+}/{bmsID:[0-9]+}/swing/{val:[0-9]+}", acHandler.GetAcPower).Methods(http.MethodGet)
 	// router.HandleFunc("/indoor/{slave:[0-9]+}/{bms:[0-9]+}/power/{val:[0-1]}", func(w http.ResponseWriter, r *http.Request) {
 
 	// 	vars := mux.Vars(r)

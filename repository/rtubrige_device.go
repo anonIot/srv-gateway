@@ -17,30 +17,7 @@ func NewRtuBridgeDevice(client *modbus.RTUClientHandler) AcIndoorRepository {
 func (r rtuBridgeDevice) AcScan() ([]AcScanRepository, error) {
 	return nil, nil
 }
-func (r rtuBridgeDevice) AcAction(slaveID int, bmsID int, addr int, val int) (*AcPacketRepository, error) {
-	slaveId := slaveID
-	bms := bmsID
-	acAddress := (addr + (bms * 10) - 1)
 
-	handler := r.Cli
-	handler.SlaveId = byte(slaveId)
-	client := modbus.NewClient(handler)
-	result, err := client.WriteSingleRegister(uint16(acAddress), uint16(val))
-
-	if err != nil {
-		return nil, err
-	}
-	now := time.Now()
-
-	acInfo := AcPacketRepository{
-		SlaveId:   slaveId,
-		Bms:       bms,
-		Value1000: result,
-		Timer:     now.String(),
-	}
-
-	return &acInfo, nil
-}
 func (r rtuBridgeDevice) AcRead(slaveId int, bmsId int) (*AcPacketRepository, error) {
 	sid := slaveId
 	bms := bmsId
@@ -59,6 +36,32 @@ func (r rtuBridgeDevice) AcRead(slaveId int, bmsId int) (*AcPacketRepository, er
 	acInfo := AcPacketRepository{
 		SlaveId:   sid,
 		Bms:       bmsId,
+		Value1000: result,
+		Timer:     now.String(),
+	}
+
+	return &acInfo, nil
+}
+
+func (r rtuBridgeDevice) AcAction(slaveID int, bmsID int, addr int, val int) (*AcPacketRepository, error) {
+	slaveId := slaveID
+	bms := bmsID
+
+	acAddress := addr
+
+	handler := r.Cli
+	handler.SlaveId = byte(slaveId)
+	client := modbus.NewClient(handler)
+	result, err := client.WriteSingleRegister(uint16(acAddress), uint16(val))
+
+	if err != nil {
+		return nil, err
+	}
+	now := time.Now()
+
+	acInfo := AcPacketRepository{
+		SlaveId:   slaveId,
+		Bms:       bms,
 		Value1000: result,
 		Timer:     now.String(),
 	}
