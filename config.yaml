@@ -3,3 +3,4 @@ rtu:
   datebits: 8
   parity: "N"
   stopbits: 1
+  uartport: "/dev/tty.usbserial-120"

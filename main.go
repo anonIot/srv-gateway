@@ -1,12 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 	"time"
 
+	"github.com/anonIot/srvgw/handler"
 	"github.com/anonIot/srvgw/repository"
 	"github.com/anonIot/srvgw/services"
 	"github.com/goburrow/modbus"
@@ -17,37 +16,43 @@ func main() {
 
 	rtuCon := initRtuConfig()
 
+	client := repository.NewRtuBridgeDevice(rtuCon)
+	rtuSev := services.NewRtuBridgeServiceDevice(client)
+	acHandler := handler.NewRtuBridgeHandler(rtuSev)
+
 	router := mux.NewRouter()
 
-	router.HandleFunc("/indoor/{slave:[0-9]+}/{bms:[0-9]+}/power/{val:[0-1]}", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/api/v2/indoor", acHandler.GetAcIndoor).Methods(http.MethodGet)
 
-		vars := mux.Vars(r)
-		slaveId, _ := strconv.Atoi(vars["slave"])
-		bms, _ := strconv.Atoi(vars["bms"])
-		powerVal, _ := strconv.Atoi(vars["val"])
+	// router.HandleFunc("/indoor/{slave:[0-9]+}/{bms:[0-9]+}/power/{val:[0-1]}", func(w http.ResponseWriter, r *http.Request) {
 
-		//client := repository.NewAcRespositoryDB(rtuCon)
-		client := repository.NewRtuBridgeDevice(rtuCon)
-		rtuSev := services.NewRtuBridgeServiceDevice(client)
-		cmd := services.AcInddorRequest{
-			SlaveId: slaveId,
-			BmsId:   bms,
-			Cmd:     "power",
-			Value:   powerVal,
-		}
-		res, err := rtuSev.GetAcAction(cmd)
-		//res, err := client.AcAction(slaveId, bms, 1000, powerVal)
+	// 	vars := mux.Vars(r)
+	// 	slaveId, _ := strconv.Atoi(vars["slave"])
+	// 	bms, _ := strconv.Atoi(vars["bms"])
+	// 	powerVal, _ := strconv.Atoi(vars["val"])
 
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			log.Printf("Error: %v", err)
-			return
-		}
+	// 	//client := repository.NewAcRespositoryDB(rtuCon)
+	// 	client := repository.NewRtuBridgeDevice(rtuCon)
+	// 	rtuSev := services.NewRtuBridgeServiceDevice(client)
+	// 	cmd := services.AcInddorRequest{
+	// 		SlaveId: slaveId,
+	// 		BmsId:   bms,
+	// 		Cmd:     "power",
+	// 		Value:   powerVal,
+	// 	}
+	// 	res, err := rtuSev.GetAcAction(cmd)
+	// 	//res, err := client.AcAction(slaveId, bms, 1000, powerVal)
 
-		w.WriteHeader(http.StatusOK)
-		fmt.Fprintf(w, "%v", res)
+	// 	if err != nil {
+	// 		w.WriteHeader(http.StatusInternalServerError)
+	// 		log.Printf("Error: %v", err)
+	// 		return
+	// 	}
 
-	}).Methods("GET")
+	// 	w.WriteHeader(http.StatusOK)
+	// 	fmt.Fprintf(w, "%v", res)
+
+	// }).Methods("GET")
 
 	err := http.ListenAndServe(":3333", router)
 	if err != nil {
@@ -59,7 +64,7 @@ func main() {
 }
 
 func initRtuConfig() *modbus.RTUClientHandler {
-	handler := modbus.NewRTUClientHandler("/dev/cu.usbserial-1120")
+	handler := modbus.NewRTUClientHandler("/dev/cu.usbserial-120")
 	handler.BaudRate = 19200
 	handler.DataBits = 8
 	handler.Parity = "N"
