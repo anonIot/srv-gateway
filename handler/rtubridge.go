@@ -2,10 +2,11 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/anonIot/srvgw/services"
+	"github.com/gorilla/mux"
 )
 
 type rtuBridgeHandler struct {
@@ -19,8 +20,11 @@ func NewRtuBridgeHandler(rtuSrv services.RtuBridgeService) rtuBridgeHandler {
 
 func (h rtuBridgeHandler) GetAcIndoor(w http.ResponseWriter, r *http.Request) {
 
-	fmt.Println("This Get Indoor")
-	acinfo, err := h.rtuSrv.GetAcValue(1, 1)
+	//vars := mux.Vars(r)
+	slaveID, _ := strconv.Atoi(mux.Vars(r)["slaveID"])
+	bmsID, _ := strconv.Atoi(mux.Vars(r)["bmsID"])
+
+	acinfo, err := h.rtuSrv.GetAcValue(slaveID, bmsID)
 	if err != nil {
 		handleError(w, err)
 		return
@@ -30,3 +34,5 @@ func (h rtuBridgeHandler) GetAcIndoor(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(acinfo)
 
 }
+
+func (h rtuBridgeHandler) GetAcAction(w http.ResponseWriter, r *http.Request) {}
