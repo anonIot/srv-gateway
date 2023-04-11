@@ -150,12 +150,22 @@ func (h rtuBridgeHandler) GetAcTemp(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("Temp")
 
+	//	sampleRegex := regexp.MustCompile(`^[+\-]?(?:(?:0|[1-9]\d*)(?:\.\d*)?|\.\d+)(?:\d[eE][+\-]?\d+)?$`)
+
 	slaveID, _ := strconv.Atoi(mux.Vars(r)["slaveID"])
 	bmsID, _ := strconv.Atoi(mux.Vars(r)["bmsID"])
-	value, _ := strconv.Atoi(mux.Vars(r)["val"])
+	//value, _ := strconv.Atoi(mux.Vars(r)["val"])
+	val := mux.Vars(r)["val"]
+	value, _ := strconv.ParseFloat(val, 64)
+	temp := int(value * 2)
 
-	if value >= 15 && value <= 30 {
-		temp := value * 2
+	// fmt.Printf("temp %v", val)
+	// fmt.Printf("temp %v", temp)
+
+	// return
+
+	if temp >= 30 && value <= 60 {
+
 		addr := (1000 + (bmsID * 10) - 1)
 		addr = addr + 2
 		fmt.Println(addr)

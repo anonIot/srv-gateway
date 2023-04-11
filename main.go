@@ -25,7 +25,7 @@ func main() {
 	//router.HandleFunc("/api/v2/indoor/{slaveID:[0-9]+}/{bmsID:[0-9]+}", acHandler.GetAcIndoor).Methods(http.MethodGet)
 	router.HandleFunc("/api/v2/indoor/cmd/{slaveID:[0-9]+}/{bmsID:[0-9]+}/{cmd:[aA-zZ]+}/{val:[0-9]+}", acHandler.GetAcCmd).Methods(http.MethodGet)
 	router.HandleFunc("/api/v2/indoor/{slaveID:[0-9]+}/{bmsID:[0-9]+}/power/{val:[0-1]+}", acHandler.GetAcPower).Methods(http.MethodGet)
-	router.HandleFunc("/api/v2/indoor/{slaveID:[0-9]+}/{bmsID:[0-9]+}/temp/{val:[0-9]+}", acHandler.GetAcTemp).Methods(http.MethodGet)
+	router.HandleFunc("/api/v2/indoor/{slaveID:[0-9]+}/{bmsID:[0-9]+}/temp/{val}", acHandler.GetAcTemp).Methods(http.MethodGet)
 	router.HandleFunc("/api/v2/indoor/{slaveID:[0-9]+}/{bmsID:[0-9]+}/mode/{val:[0-9]+}", acHandler.GetAcMode).Methods(http.MethodGet)
 	router.HandleFunc("/api/v2/indoor/{slaveID:[0-9]+}/{bmsID:[0-9]+}/fanspeed/{val:[0-9]+}", acHandler.GetFanSpeed).Methods(http.MethodGet)
 	router.HandleFunc("/api/v2/indoor/{slaveID:[0-9]+}/{bmsID:[0-9]+}/swing/{val:[0-9]+}", acHandler.GetSwing).Methods(http.MethodGet)
@@ -62,14 +62,12 @@ func main() {
 	err := http.ListenAndServe(":3333", router)
 	if err != nil {
 		log.Fatalf("HTTP Server : %v", err)
-	} else {
-
 	}
 
 }
 
 func initRtuConfig() *modbus.RTUClientHandler {
-	handler := modbus.NewRTUClientHandler("/dev/cu.usbserial-120")
+	handler := modbus.NewRTUClientHandler("/dev/cu.usbserial-1120")
 	handler.BaudRate = 19200
 	handler.DataBits = 8
 	handler.Parity = "N"
