@@ -14,11 +14,11 @@ func NewRtuBridgeDevice(client *modbus.RTUClientHandler) AcIndoorRepository {
 	return rtuBridgeDevice{Cli: client}
 }
 
-func (r rtuBridgeDevice) AcScan() ([]AcScanRepository, error) {
+func (r rtuBridgeDevice) AcScaner() ([]AcScanRepository, error) {
 	return nil, nil
 }
 
-func (r rtuBridgeDevice) AcRead(slaveId int, bmsId int) (*AcPacketRepository, error) {
+func (r rtuBridgeDevice) AcReader(slaveId int, bmsId int) (*AcPacketRepository, error) {
 	sid := slaveId
 	bms := bmsId
 

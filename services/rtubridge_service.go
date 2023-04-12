@@ -16,7 +16,7 @@ func NewRtuBridgeServiceDevice(RtuDevice repository.AcIndoorRepository) RtuBridg
 
 func (s RtuBridgeServiceDevice) GetAcValue(slaveID int, bmsId int) (*AcIndoorInfo, error) {
 
-	result, err := s.RtuDevice.AcRead(slaveID, bmsId)
+	result, err := s.RtuDevice.AcReader(slaveID, bmsId)
 	if err != nil {
 		return nil, err
 	}
