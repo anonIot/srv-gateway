@@ -59,7 +59,7 @@ func main() {
 
 	// }).Methods("GET")
 
-	err := http.ListenAndServe(":3333", router)
+	err := http.ListenAndServe(":3002", router)
 	if err != nil {
 		log.Fatalf("HTTP Server : %v", err)
 	}

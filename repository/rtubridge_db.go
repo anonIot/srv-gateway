@@ -1,83 +1,23 @@
 package repository
 
-import (
-	"fmt"
-	"log"
-	"time"
-
-	"github.com/goburrow/modbus"
-)
-
-type acRepositoryDB struct {
-	Cli *modbus.RTUClientHandler
+type IndoorInfoDB struct {
+	ID       string      `db:"id"`
+	Uid      int         `db:"uid"`
+	Bms      int         `db:"bms"`
+	DeviceSn string      `db:"devicesn"`
+	Acvalue  indoorValue `db:"acvalue"`
 }
 
-type acActionCmd struct {
-	SlaveId int
-	BnsId   int
-	Address int
-	Val     int
+type indoorValue struct {
+	Value1000 []byte `db:"value1000"`
+	Value2000 []byte `db:"value2000"`
+	Value3000 []byte `db:"value3000"`
+	Value4000 []byte `db:"value4000"`
 }
 
-func NewAcRespositoryDB(Client *modbus.RTUClientHandler) acRepositoryDB {
-
-	return acRepositoryDB{Cli: Client}
-}
-
-func (r acRepositoryDB) AcAction(slaveID int, bmsId int, addr int, val int) (*AcPacketRepository, error) {
-	sid := slaveID
-	bms := bmsId
-
-	handler := r.Cli
-	handler.SlaveId = byte(sid)
-	acAddress := (addr + (bms * 10)) - 1
-	client := modbus.NewClient(handler)
-	cmd, err := client.WriteSingleRegister(uint16(acAddress), uint16(val))
-
-	if err != nil {
-		log.Fatalf("cmd err %v", err)
-		return nil, err
-	}
-	fmt.Println(cmd)
-
-	results, err := client.ReadHoldingRegisters(uint16(acAddress), uint16(10))
-
-	if err != nil {
-		return nil, err
-	}
-
-	now := time.Now()
-
-	acInfo := AcPacketRepository{
-		SlaveId:   sid,
-		Bms:       bmsId,
-		Value1000: results,
-		Timer:     now.String(),
-	}
-
-	return &acInfo, nil
-}
-func (r acRepositoryDB) AcRead(slaveID int, bmsId int) (*AcPacketRepository, error) {
-	sid := slaveID
-	bms := bmsId
-
-	handler := r.Cli
-	handler.SlaveId = byte(sid)
-	acAddress := (1000 + (bms * 10)) - 1
-	client := modbus.NewClient(handler)
-	results, err := client.ReadHoldingRegisters(uint16(acAddress), uint16(10))
-
-	if err != nil {
-		return nil, err
-	}
-	now := time.Now()
-
-	acInfo := AcPacketRepository{
-		SlaveId:   sid,
-		Bms:       bmsId,
-		Value1000: results,
-		Timer:     now.String(),
-	}
-
-	return &acInfo, nil
+type AcRepositoryDB interface {
+	AcNewer(IndoorInfoDB) (*IndoorInfoDB, error)
+	AcUpdater(int, IndoorInfoDB) (bool, error)
+	AcDeleter(int) (bool, error)
+	AcReader(int) (*IndoorInfoDB, error)
 }
