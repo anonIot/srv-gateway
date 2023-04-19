@@ -22,7 +22,7 @@ func main() {
 
 	router := mux.NewRouter()
 
-	//router.HandleFunc("/api/v2/indoor/{slaveID:[0-9]+}/{bmsID:[0-9]+}", acHandler.GetAcIndoor).Methods(http.MethodGet)
+	router.HandleFunc("/api/v2/indoor/{slaveID:[0-9]+}/{bmsID:[0-9]+}", acHandler.GetAcIndoor).Methods(http.MethodGet)
 	router.HandleFunc("/api/v2/indoor/cmd/{slaveID:[0-9]+}/{bmsID:[0-9]+}/{cmd:[aA-zZ]+}/{val:[0-9]+}", acHandler.GetAcCmd).Methods(http.MethodGet)
 	router.HandleFunc("/api/v2/indoor/{slaveID:[0-9]+}/{bmsID:[0-9]+}/power/{val:[0-1]+}", acHandler.GetAcPower).Methods(http.MethodGet)
 	router.HandleFunc("/api/v2/indoor/{slaveID:[0-9]+}/{bmsID:[0-9]+}/temp/{val}", acHandler.GetAcTemp).Methods(http.MethodGet)

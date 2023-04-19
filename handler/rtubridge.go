@@ -31,6 +31,8 @@ func (h rtuBridgeHandler) GetAcIndoor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println(acinfo)
+
 	w.Header().Set("content-type", "application/json")
 	json.NewEncoder(w).Encode(acinfo)
 
@@ -160,11 +162,11 @@ func (h rtuBridgeHandler) GetAcTemp(w http.ResponseWriter, r *http.Request) {
 	temp := int(value * 2)
 
 	// fmt.Printf("temp %v", val)
-	// fmt.Printf("temp %v", temp)
+	fmt.Printf("Is temp =  %v\n", temp)
 
 	// return
 
-	if temp >= 30 && value <= 60 {
+	if temp >= 30 && temp <= 60 {
 
 		addr := (1000 + (bmsID * 10) - 1)
 		addr = addr + 2
