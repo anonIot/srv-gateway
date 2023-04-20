@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/anonIot/srvgw/handler"
@@ -11,6 +12,7 @@ import (
 	"github.com/anonIot/srvgw/services"
 	"github.com/goburrow/modbus"
 	"github.com/gorilla/mux"
+	"github.com/spf13/viper"
 )
 
 func isAuthrized(endpoint func(http.ResponseWriter, *http.Request)) http.Handler {
@@ -76,6 +78,8 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
+	initTimeZone()
+
 	rtuCon := initRtuConfig()
 
 	client := repository.NewRtuBridgeDevice(rtuCon)
@@ -103,11 +107,18 @@ func main() {
 }
 
 func initRtuConfig() *modbus.RTUClientHandler {
-	handler := modbus.NewRTUClientHandler("/dev/cu.usbserial-1120")
-	handler.BaudRate = 19200
+
+	initConfig()
+
+	rtuPort := fmt.Sprintf("%v", viper.Get("rtu.uartport"))
+	rtuBaudrate := viper.GetInt("rtu.baudrate")
+	rtuParity := viper.GetString("rtu.parity")
+
+	handler := modbus.NewRTUClientHandler(rtuPort)
+	handler.BaudRate = rtuBaudrate
 	handler.DataBits = 8
-	handler.Parity = "N"
-	handler.StopBits = 1
+	handler.Parity = rtuParity
+	handler.StopBits = viper.GetInt("rtu.stopbits")
 	handler.SlaveId = 1
 	handler.Timeout = 3 * time.Second
 
@@ -119,4 +130,26 @@ func initRtuConfig() *modbus.RTUClientHandler {
 		return nil
 	}
 	return handler
+}
+
+func initConfig() {
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(".")
+	viper.AutomaticEnv()
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+
+	err := viper.ReadInConfig()
+	if err != nil {
+		panic(err)
+	}
+}
+
+func initTimeZone() {
+	ict, err := time.LoadLocation("Asia/Bangkok")
+	if err != nil {
+		panic(err)
+	}
+
+	time.Local = ict
 }

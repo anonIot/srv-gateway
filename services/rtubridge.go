@@ -1,17 +1,17 @@
 package services
 
 type AcIndoorInfo struct {
-	SlaveId   int
-	Bms       int
-	Value1000 []byte
-	Timer     string
+	SlaveId   int    `json:"slaveid"`
+	Bms       int    `json:"bms"`
+	Value1000 []byte `json:"value1000"`
+	Timer     string `json:"timer"`
 }
 
 type AcInddorRequest struct {
-	SlaveId int
-	BmsId   int
-	Addr    int
-	Value   int
+	SlaveId int `json:"slaveid"`
+	BmsId   int `json:"bmsid"`
+	Addr    int `json:"addr"`
+	Value   int `json:"value"`
 }
 
 type RtuBridgeService interface {

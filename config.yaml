@@ -1,6 +1,7 @@
 rtu:
   baudrate: 19200
-  datebits: 8
+  databits: 8
   parity: "N"
   stopbits: 1
+  slaveid: 1
   uartport: "/dev/tty.usbserial-1120"
