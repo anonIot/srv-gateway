@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -12,6 +13,67 @@ import (
 	"github.com/gorilla/mux"
 )
 
+func isAuthrized(endpoint func(http.ResponseWriter, *http.Request)) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "No Auth")
+		endpoint(w, r)
+	})
+}
+
+/*
+**
+
+	func getToken(name string) (string, error) {
+		signingKey := []byte("keymaker")
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+			"name": name,
+			"role": "redpill",
+		})
+		tokenString, err := token.SignedString(signingKey)
+		return tokenString, err
+	}
+
+	func verifyToken(tokenString string) (jwt.Claims, error) {
+		signingKey := []byte("keymaker")
+		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			return signingKey, nil
+		})
+		if err != nil {
+			return nil, err
+		}
+		return token.Claims, err
+	}
+
+	func authMiddleware(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+			tokenString := r.Header.Get("Authorization")
+			if len(tokenString) == 0 {
+				w.WriteHeader(http.StatusUnauthorized)
+				w.Write([]byte("Missing Authorization Header"))
+				return
+			}
+			tokenString = strings.Replace(tokenString, "Bearer ", "", 1)
+			claims, err := verifyToken(tokenString)
+			if err != nil {
+				w.WriteHeader(http.StatusUnauthorized)
+				w.Write([]byte("Error verifying JWT token: " + err.Error()))
+				return
+			}
+			name := claims.(jwt.MapClaims)["name"].(string)
+			role := claims.(jwt.MapClaims)["role"].(string)
+
+			r.Header.Set("name", name)
+			r.Header.Set("role", role)
+
+			next.ServeHTTP(w, r)
+		})
+	}
+*/
+func homePage(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Super hooks")
+}
+
 func main() {
 
 	rtuCon := initRtuConfig()
@@ -22,42 +84,16 @@ func main() {
 
 	router := mux.NewRouter()
 
-	router.HandleFunc("/api/v2/indoor/{slaveID:[0-9]+}/{bmsID:[0-9]+}", acHandler.GetAcIndoor).Methods(http.MethodGet)
+	// router.HandleFunc("/api/v2/indoor/{slaveID:[0-9]+}/{bmsID:[0-9]+}", acHandler.GetAcIndoor).Methods(http.MethodGet)
+	router.Handle("/api/v2/indoor/{slaveID:[0-9]+}/{bmsID:[0-9]+}", isAuthrized(acHandler.GetAcIndoor)).Methods(http.MethodGet)
 	router.HandleFunc("/api/v2/indoor/cmd/{slaveID:[0-9]+}/{bmsID:[0-9]+}/{cmd:[aA-zZ]+}/{val:[0-9]+}", acHandler.GetAcCmd).Methods(http.MethodGet)
 	router.HandleFunc("/api/v2/indoor/{slaveID:[0-9]+}/{bmsID:[0-9]+}/power/{val:[0-1]+}", acHandler.GetAcPower).Methods(http.MethodGet)
 	router.HandleFunc("/api/v2/indoor/{slaveID:[0-9]+}/{bmsID:[0-9]+}/temp/{val}", acHandler.GetAcTemp).Methods(http.MethodGet)
 	router.HandleFunc("/api/v2/indoor/{slaveID:[0-9]+}/{bmsID:[0-9]+}/mode/{val:[0-9]+}", acHandler.GetAcMode).Methods(http.MethodGet)
 	router.HandleFunc("/api/v2/indoor/{slaveID:[0-9]+}/{bmsID:[0-9]+}/fanspeed/{val:[0-9]+}", acHandler.GetFanSpeed).Methods(http.MethodGet)
 	router.HandleFunc("/api/v2/indoor/{slaveID:[0-9]+}/{bmsID:[0-9]+}/swing/{val:[0-9]+}", acHandler.GetSwing).Methods(http.MethodGet)
-	// router.HandleFunc("/indoor/{slave:[0-9]+}/{bms:[0-9]+}/power/{val:[0-1]}", func(w http.ResponseWriter, r *http.Request) {
 
-	// 	vars := mux.Vars(r)
-	// 	slaveId, _ := strconv.Atoi(vars["slave"])
-	// 	bms, _ := strconv.Atoi(vars["bms"])
-	// 	powerVal, _ := strconv.Atoi(vars["val"])
-
-	// 	//client := repository.NewAcRespositoryDB(rtuCon)
-	// 	client := repository.NewRtuBridgeDevice(rtuCon)
-	// 	rtuSev := services.NewRtuBridgeServiceDevice(client)
-	// 	cmd := services.AcInddorRequest{
-	// 		SlaveId: slaveId,
-	// 		BmsId:   bms,
-	// 		Cmd:     "power",
-	// 		Value:   powerVal,
-	// 	}
-	// 	res, err := rtuSev.GetAcAction(cmd)
-	// 	//res, err := client.AcAction(slaveId, bms, 1000, powerVal)
-
-	// 	if err != nil {
-	// 		w.WriteHeader(http.StatusInternalServerError)
-	// 		log.Printf("Error: %v", err)
-	// 		return
-	// 	}
-
-	// 	w.WriteHeader(http.StatusOK)
-	// 	fmt.Fprintf(w, "%v", res)
-
-	// }).Methods("GET")
+	router.Handle("/auth", isAuthrized(homePage))
 
 	err := http.ListenAndServe(":3002", router)
 	if err != nil {
