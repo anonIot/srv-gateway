@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "./rtuservice"
+		},
+		{
+			"path": "./localapi"
+		},
+		{
+			"path": "./srvapi"
+		}
+	],
+	"settings": {}
+}
