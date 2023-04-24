@@ -42,6 +42,12 @@ func main() {
 		return "recv " + msg
 	})
 
+	server.OnEvent("/", "device/demo123", func(s socketio.Conn, msg string) string {
+		s.SetContext(msg)
+		fmt.Println("device/demo123", msg)
+		return "recv " + msg
+	})
+
 	server.OnEvent("/", "bye", func(s socketio.Conn) string {
 		last := s.Context().(string)
 		s.Emit("bye", last)
